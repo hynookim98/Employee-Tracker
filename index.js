@@ -117,7 +117,7 @@ function addDepartment() {
         let department = res;
         // call a function to create the department passing it the name as a parameter
         db.createDepartment(department)
-            .then(() => console.log(`✅ Added ${department.name} to the database`))
+            .then(() => console.log(`✅ Successfully Added ${department.name} to the database`))
             .then(() => loadQuestions())
     });
 };
@@ -151,7 +151,7 @@ function addRole() {
             ])
                 .then(role => {
                     db.createRole(role)
-                        .then(() => console.log(`✅ Added ${role.role_name} to the database`))
+                        .then(() => console.log(`✅ Successfully Added ${role.role_name} to the database`))
                         .then(() => loadQuestions())
                 });
         });
@@ -216,12 +216,62 @@ function addEmployee() {
 
                             db.createEmployee(employee);
                             })
-                            .then(() => console.log(`✅Added ${firstName} ${lastName} to the database`))
+                            .then(() => console.log(`✅ Successfully Added ${firstName} ${lastName} to the database`))
                             .then(() => loadQuestions())
                         })
                 })
             })
     })
+};
+
+// update employee's role
+function updateEmployeeRole() {
+    // grab all current employees to se who to update
+    db.findAllEmployees()
+    .then(([data]) => {
+      const currentEmployees = data.map(({ id, first_name, last_name }) => ({
+        name: `${first_name} ${last_name}`,
+        value: id
+      }));
+
+      prompt([
+        {
+          type: "list",
+          name: "employeeId",
+          message: "Which employee's role do you want to update?",
+          choices: currentEmployees
+        }
+      ])
+        .then(res => {
+          let employeeId = res.employeeId;
+        //   grab all current roles to assign to employee
+          db.findAllRoles()
+            .then(([data]) => {
+              const currentRoles = data.map(({ id, title }) => ({
+                name: title,
+                value: id
+              }));
+
+              prompt([
+                {
+                  type: "list",
+                  name: "roleId",
+                  message: "Which role do you want to assign the selected employee?",
+                  choices: currentRoles
+                }
+              ])
+                .then(res => db.updateEmployeeRole(employeeId, res.roleId))
+                .then(() => console.log("✅ Successfully updated employee's role"))
+                .then(() => loadQuestions())
+            });
+        });
+    })
+};
+
+function quit() {
+    console.log("Thank you for using my program!")
+    // quit current process
+    process.exit();
 };
 
 // initialize program

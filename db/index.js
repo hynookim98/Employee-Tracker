@@ -40,6 +40,18 @@ class dataBase {
             "INSERT INTO role SET ?", role
         );
     };
+
+    createEmployee(newHire) {
+        return this.connection.promise().query(
+            "INSERT INTO employee SET ?", newHire
+        );
+    };
+
+    updateEmployeeRole(employeeId, roleId) {
+        return this.connection.promise().query(
+            "UPDATE employee SET role_id = > WHERE id = ?", [roleId, employeeId]
+        );
+    };
 }
 
 module.exports = new dataBase(connection);
