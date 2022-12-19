@@ -47,6 +47,26 @@ function loadQuestions() {
                     value: "VIEW_EMPLOYEES_BY_MANAGER"
                 },
                 {
+                    name: "View Employees by Department",
+                    value: "VIEW_EMPLOYEES_BY_DEPARTMENT"
+                },
+                {
+                    name: "Delete a Department",
+                    value: "DELETE_DEPARTMENT"
+                },
+                {
+                    name: "Delete a Role",
+                    value: "DELETE_ROLE"
+                },
+                {
+                    name: "Delete an Employee",
+                    value: "DELETE_EMPLOYEE"
+                },
+                {
+                    name: "View Total Utilized Department Budget",
+                    value: "VIEW_TOTAL_BUDGET"
+                },
+                {
                     name: 'Quit Program',
                     value: "QUIT"
                 }
@@ -74,6 +94,16 @@ function loadQuestions() {
             case "UPDATE_EMPLOYEE_MANAGER" : updateEmployeeManager();
             break;
             case "VIEW_EMPLOYEES_BY_MANAGER" : viewEmployeeManager();
+            break;
+            case "VIEW_EMPLOYEES_BY_DEPARTMENT" : viewEmployeeDepartment();
+            break;
+            case "DELETE_DEPARTMENT" : deleteDepartment();
+            break;
+            case "DELETE_ROLE" : deleteRole();
+            break;
+            case "DELETE_EMPLOYEE" : deleteEmployee();
+            break;
+            case "VIEW_TOTAL_BUDGET" : viewTotalBudget();
             break;
             case "QUIT" : quit();
             break;
@@ -351,6 +381,109 @@ function viewEmployeeManager() {
             })
             .then(() => loadQuestions())
         })
+};
+
+// *view employees by department *bonus
+function viewEmployeeDepartment() {
+    db.viewAllDepartments()
+      .then(([data]) => {
+        const currentDepartments = data.map(({ id, name }) => ({
+            name: name,
+            value: id
+        }));
+
+        prompt([
+            {
+                type: "list",
+                name: "departmentId",
+                message: "Which department would you like to see?",
+                choices: currentDepartments
+            }
+        ])
+        .then(res => db.findEmployeesByDepartment(res.departmentId))
+        .then(([data]) => {
+            console.log("\n");
+            console.table(data);
+        })
+        .then(() => loadQuestions())
+      });
+};
+
+// delete departments
+function deleteDepartment() {
+    db.viewAllDepartments()
+    .then(([data]) => {
+        const departmentChoices = data.map(({ id, name }) => ({
+          name: name,
+          value: id
+        }));
+  
+        prompt({
+          type: "list",
+          name: "departmentId",
+          message: "Which department would you like to delete? (Note: This will also remove associated roles and employees)",
+          choices: departmentChoices
+        })
+          .then(res => db.removeDepartment(res.departmentId))
+          .then(() => console.log(`✅ Successfully removed department from the database`))
+          .then(() => loadQuestions())
+      })
+};
+
+// delete roles
+function deleteRole() {
+    db.viewAllRoles()
+    .then(([data]) => {
+      const currentRoles = data.map(({ id, title }) => ({
+        name: title,
+        value: id
+      }));
+
+      prompt([
+        {
+          type: "list",
+          name: "roleId",
+          message: "Which role do you want to remove? (Note: This will also remove associated employees)",
+          choices: currentRoles
+        }
+      ])
+        .then(res => db.removeRole(res.roleId))
+        .then(() => console.log("✅ Successfully removed role from the database"))
+        .then(() => loadQuestions())
+    })
+};
+
+// delete employees
+function deleteEmployee() {
+    db.viewAllEmployees()
+    .then(([data]) => {
+      const currentEmployees = data.map(({ id, first_name, last_name }) => ({
+        name: `${first_name} ${last_name}`,
+        value: id
+      }));
+
+      prompt([
+        {
+          type: "list",
+          name: "employeeId",
+          message: "Which employee do you want to remove?",
+          choices: currentEmployees
+        }
+      ])
+        .then(res => db.removeEmployee(res.employeeId))
+        .then(() => console.log("✅ Successfully removed employee from the database"))
+        .then(() => loadMainPrompts())
+    })
+};
+
+// view total utilized budget
+function viewTotalBudget() {
+    db.viewDepartmentBudgets()
+      .then(([data]) => {
+        console.log("\n");
+        console.table(data);
+      })
+      .then(() => loadQuestions());
 };
 
 // end program
