@@ -52,6 +52,19 @@ class dataBase {
             "UPDATE employee SET role_id = > WHERE id = ?", [roleId, employeeId]
         );
     };
+
+    findPossibleManagers(employeeId) {
+        // find all possible managers which is all the employees minus the one we are updating
+        return this.connection.promise().query(
+            "SELECT id, first_name, last_name FROM employee WHERE id != ?", employeeId
+        );
+    };
+
+    updateEmployeeManager(employeeId, managerId) {
+        return this.connection.promise().query(
+            "UPDATE employee SET manager_id = ? WHERE id = ?", [managerId, employeeId]
+        );
+    };
 }
 
 module.exports = new dataBase(connection);

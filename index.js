@@ -39,6 +39,10 @@ function loadQuestions() {
                     value: "UPDATE_EMPLOYEE_ROLE"
                 },
                 {
+                    name: "Update an Employee's Manager",
+                    value: "UPDATE_EMPLOYEE_MANAGER"
+                },
+                {
                     name: 'Quit Program',
                     value: "QUIT"
                 }
@@ -62,6 +66,8 @@ function loadQuestions() {
             case "ADD_EMPLOYEE" : addEmployee();
             break;
             case "UPDATE_EMPLOYEE_ROLE" : updateEmployeeRole();
+            break;
+            case "UPDATE_EMPLOYEE_MANAGER" : updateEmployeeManager();
             break;
             case "QUIT" : quit();
             break;
@@ -267,6 +273,48 @@ function updateEmployeeRole() {
             });
         });
     })
+};
+
+// *update employee manager *bonus
+function updateEmployeeManager() {
+    db.viewAllEmployees()
+        .then(([data]) => {
+            const currentEmployees = data.map(({ id, first_name, last_name }) => ({
+                name: `${first_name} ${last_name}`,
+            }));
+
+            prompt([
+                {
+                    type: "list",
+                    name: "employee",
+                    message: "Which employee's manager would you like to update?",
+                    choices: currentEmployees
+                }
+            ])
+            .then(res => {
+                let employeeId = res.employeeId
+                // possible managers are any employees
+                db.findPossibleManagers(employeeId)
+                    .then(([data]) => {
+                        const possibleManagers = data.map(({ id, first_name, last_name }) => ({
+                            name: `${first_name} ${last_name}`,
+                            value: id
+                        }));
+
+                        prompt([
+                            {
+                                type: "list",
+                                name: "managerId",
+                                message: "Which employee would you like to manage the selected employee?",
+                                choices: possibleManagers
+                            }
+                        ])
+                        .then(res => db.updateEmployeeManager(employeeId, res.managerId))
+                        .then(() => console.log("✅ Successfully updated employee's manager"))
+                        .then(() => loadQuestions())
+                    })
+            })
+        })
 };
 
 function quit() {
