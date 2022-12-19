@@ -1,5 +1,6 @@
 const { prompt } = require('inquirer');
 const db = require('./db');
+require("console.table");
 
 // main loading screen with questions for user
 function loadQuestions() {
@@ -78,7 +79,7 @@ function viewDepartments() {
             let departments = data;
             // console log statement to print new line for formatting display
             console.log("\n");
-            console.log(departments);
+            console.table(departments);
         })
         // after finishing function return to main question for diff input 
         .then(() => loadQuestions());
