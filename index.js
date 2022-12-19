@@ -43,6 +43,10 @@ function loadQuestions() {
                     value: "UPDATE_EMPLOYEE_MANAGER"
                 },
                 {
+                    name: "View Employees by Manager",
+                    value: "VIEW_EMPLOYEES_BY_MANAGER"
+                },
+                {
                     name: 'Quit Program',
                     value: "QUIT"
                 }
@@ -68,6 +72,8 @@ function loadQuestions() {
             case "UPDATE_EMPLOYEE_ROLE" : updateEmployeeRole();
             break;
             case "UPDATE_EMPLOYEE_MANAGER" : updateEmployeeManager();
+            break;
+            case "VIEW_EMPLOYEES_BY_MANAGER" : viewEmployeeManager();
             break;
             case "QUIT" : quit();
             break;
@@ -317,6 +323,37 @@ function updateEmployeeManager() {
         })
 };
 
+// *view employees by manager *bonus
+function viewEmployeeManager() {
+    db.viewAllEmployees()
+        .then(([data]) => {
+            const currentManagers = data.map(({ id, first_name, last_name}) => ({
+                name: `${first_name} ${last_name}`,
+                value: id
+            }));
+
+            prompt([
+                {
+                    type: 'list',
+                    name: 'managerId',
+                    message: 'Which manager do you want see who is working under them?',
+                    choices: currentManagers
+                }
+            ])
+            .then(res => db.findEmployeesByManager(res.managerId))
+            .then (([data]) => {
+                console.log("\n");
+                if(data.length === 0) {
+                    console.log("The selected employee is not a manager and does not have anyone working under them");
+                } else {
+                    console.table(data);
+                }
+            })
+            .then(() => loadQuestions())
+        })
+};
+
+// end program
 function quit() {
     console.log("Thank you for using my program!")
     // quit current process

@@ -65,6 +65,12 @@ class dataBase {
             "UPDATE employee SET manager_id = ? WHERE id = ?", [managerId, employeeId]
         );
     };
+
+    findEmployeesByManager(managerId) {
+        return this.connection.promise().query(
+            "SELECT employee.id, employee.first_name, employee.last_name, department.name, role.title FROM employee LEFT JOIN role on role.id = employee.role_id LEFT JOIN department ON department.id = role.department_id WHERE manager_id = ?;"
+        );
+    };
 }
 
 module.exports = new dataBase(connection);
