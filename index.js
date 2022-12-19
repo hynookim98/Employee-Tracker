@@ -66,8 +66,8 @@ function loadQuestions() {
             break;
             default: console.error("Unexpected User Choice");
             break;
-        };
-    });
+        }
+    })
 };
 
 // view all departments
