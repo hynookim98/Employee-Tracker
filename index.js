@@ -178,7 +178,7 @@ function addRole() {
 
             prompt([
                 {
-                    name: "role_name",
+                    name: "title",
                     message: "What is the name of the new role?"
                 },
                 {
@@ -188,7 +188,7 @@ function addRole() {
                 {
                     type: 'list',
                     name: 'department_id',
-                    message: `Which department does ${this.role_name} belong to?`,
+                    message: `Which department does the new role belong to?`,
                     choices: currentDepartments
                 }
             ])
@@ -232,7 +232,7 @@ function addEmployee() {
                 .then(res => {
                     let roleId = res.roleId;
                     
-                    db.findAllEmployees()
+                    db.viewAllEmployees()
                         .then(([data]) => {
                         const currentEmployees = data.map(({ id, first_name, last_name }) => ({
                             name: `${first_name} ${last_name}`,
@@ -253,13 +253,13 @@ function addEmployee() {
                             let employee = {
                                 manager_id: res.managerId,
                                 role_id: roleId,
-                                first_name: firstName,
-                                last_name: lastName
+                                first_name: fname,
+                                last_name: lname
                             }
 
                             db.createEmployee(employee);
                             })
-                            .then(() => console.log(`✅ Successfully Added ${firstName} ${lastName} to the database`))
+                            .then(() => console.log(`✅ Successfully Added ${fname} ${lname} to the database`))
                             .then(() => loadQuestions())
                         })
                 })
@@ -270,7 +270,7 @@ function addEmployee() {
 // update employee's role
 function updateEmployeeRole() {
     // grab all current employees to se who to update
-    db.findAllEmployees()
+    db.viewAllEmployees()
     .then(([data]) => {
       const currentEmployees = data.map(({ id, first_name, last_name }) => ({
         name: `${first_name} ${last_name}`,
@@ -288,7 +288,7 @@ function updateEmployeeRole() {
         .then(res => {
           let employeeId = res.employeeId;
         //   grab all current roles to assign to employee
-          db.findAllRoles()
+          db.viewAllRoles()
             .then(([data]) => {
               const currentRoles = data.map(({ id, title }) => ({
                 name: title,
@@ -317,12 +317,13 @@ function updateEmployeeManager() {
         .then(([data]) => {
             const currentEmployees = data.map(({ id, first_name, last_name }) => ({
                 name: `${first_name} ${last_name}`,
+                value: id
             }));
 
             prompt([
                 {
                     type: "list",
-                    name: "employee",
+                    name: "employeeId",
                     message: "Which employee's manager would you like to update?",
                     choices: currentEmployees
                 }
@@ -472,7 +473,7 @@ function deleteEmployee() {
       ])
         .then(res => db.removeEmployee(res.employeeId))
         .then(() => console.log("✅ Successfully removed employee from the database"))
-        .then(() => loadMainPrompts())
+        .then(() => loadQuestions())
     })
 };
 

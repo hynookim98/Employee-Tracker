@@ -35,11 +35,11 @@ class dataBase {
     };
 
     createRole(role) {
-        // query to update roles table with new role
+        // query to create new role
         return this.connection.promise().query(
             "INSERT INTO role SET ?", role
         );
-    };
+      };
 
     createEmployee(newHire) {
         return this.connection.promise().query(
@@ -49,7 +49,7 @@ class dataBase {
 
     updateEmployeeRole(employeeId, roleId) {
         return this.connection.promise().query(
-            "UPDATE employee SET role_id = > WHERE id = ?", [roleId, employeeId]
+            "UPDATE employee SET role_id = ? WHERE id = ?", [roleId, employeeId]
         );
     };
 
@@ -57,7 +57,7 @@ class dataBase {
         // find all possible managers which is all the employees minus the one we are updating
         return this.connection.promise().query(
             "SELECT id, first_name, last_name FROM employee WHERE id != ?", employeeId
-        );
+          );
     };
 
     updateEmployeeManager(employeeId, managerId) {
