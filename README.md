@@ -10,7 +10,7 @@ Thank you for taking the time to use my program!
 
 ## Installation
 To use the program, you need to install the necessary dependencies. You can either use *npm i* to install from the package.json or use 
-*npm init -y* OR 
+*npm init -y* AND 
 *npm i inquirer@8.2.4 console.table mysql2*
 
 ## Usage
